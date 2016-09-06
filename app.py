@@ -2,35 +2,46 @@
 Simple Flask app to receive Salesforce data and write it to Kafka.
 """
 
+import kafka_adapter
 import os
-from flask import Flask, jsonify, request
+from flask import Flask, request
 
 app = Flask(__name__)
-
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
+
+CHATTER_TOPIC = 'chatter'
+PRODUCER = kafka_adapter.get_kafka_producer()
 
 
 @app.route('/sf-data', methods=['POST'])
 def sf_data():
     """
-    Receives serialized sObject data. Intended to be called from an asynchronous Apex.
+    Receives serialized sObject data and writes selected fields to Kafka.
+    Intended to be called from an asynchronous Apex.
 
     Test it with something like:
-    curl -H "Content-Type: application/json" -X POST -d '{"username":"xyz","password":"xyz"}' http://127.0.0.1:5000/sf-data
+    curl -H "Content-Type: application/json" -X POST -d '[{"ParentId":"P", "Body":"My Message"}]' http://127.0.0.1:5000/sf-data
     """
     # TODO: verify origin of request using the secret key.
-    error = None
     if request.method == 'POST':
-        data = request.get_json()
-        # TODO: write to Kafka
-        return str(data)
+        sobject_list = request.get_json() or []
+        for sobject in sobject_list:
+            # TODO: be selective about what data to write.
+            write_to_kafka(key=str(sobject['ParentId']), value=sobject)
+        return str(sobject_list)
+
+
+def write_to_kafka(key, value):
+    PRODUCER.send(CHATTER_TOPIC, key=key, value=value)
+    PRODUCER.flush()
+
 
 @app.route('/')
 def home():
     """
     Default home page.
     """
-    return('hey hey')
+    return 'hey hey'
 
 
 if __name__ == '__main__':

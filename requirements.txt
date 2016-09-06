@@ -8,3 +8,10 @@ flask
 # Production Server
 # ----------------------
 gunicorn
+
+
+# ----------------------
+# Kafka
+# ----------------------
+kafka-python
+cryptography
