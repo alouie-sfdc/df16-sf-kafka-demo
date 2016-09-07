@@ -87,11 +87,10 @@ def get_kafka_brokers():
             [urlparse(url) for url in os.environ.get('KAFKA_URL').split(',')]]
 
 
-def get_kafka_producer():
+def get_kafka_producer(acks='all',
+                       value_serializer=lambda v: json.dumps(v).encode('utf-8')):
     """
-    Return a KafkaProducer that uses the SSLContext created with create_ssl_context,
-    and has JSON serialization for values.
-
+    Return a KafkaProducer that uses the SSLContext created with create_ssl_context.
     Returns None if there are no Kafka brokers.
     """
     brokers = get_kafka_brokers()
@@ -103,18 +102,17 @@ def get_kafka_producer():
         bootstrap_servers=brokers,
         security_protocol='SSL',
         ssl_context=get_kafka_ssl_context(),
-        value_serializer=lambda v: json.dumps(v).encode('utf-8'),
-        acks='all'
+        value_serializer=value_serializer,
+        acks=acks
     )
 
     return producer
 
 
-def get_kafka_consumer(topic=None):
+def get_kafka_consumer(topic=None,
+                       value_deserializer=lambda v: json.loads(v.decode('utf-8'))):
     """
-    Return a KafkaConsumer that uses the SSLContext created with create_ssl_context,
-    and has JSON deserialization for values.
-
+    Return a KafkaConsumer that uses the SSLContext created with create_ssl_context.
     Returns None if there are no Kafka brokers.
     """
     brokers = get_kafka_brokers()
@@ -129,7 +127,7 @@ def get_kafka_consumer(topic=None):
         bootstrap_servers=brokers,
         security_protocol='SSL',
         ssl_context=get_kafka_ssl_context(),
-        value_deserializer=lambda v: json.loads(v.decode('utf-8'))
+        value_deserializer=value_deserializer
     )
 
     return consumer
