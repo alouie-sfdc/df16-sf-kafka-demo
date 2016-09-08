@@ -26,7 +26,8 @@ def sf_data():
     if request.method == 'POST':
         sobject_list = request.get_json() or []
         sobject_type = sobject_list[0]['attributes']['type'] if sobject_list else None
-        fields = ('Body' if sobject_type is 'FeedItem' else 'CommentBody', 'ParentId', 'CreatedById', 'CreatedDate')
+
+        fields = ('Body' if sobject_type == 'FeedItem' else 'CommentBody', 'ParentId', 'CreatedById', 'CreatedDate')
         filtered_sobject_list = [ {key: x[key] for key in fields} for x in sobject_list ]
         for sobject in filtered_sobject_list:
             write_to_kafka(key=str(sobject['ParentId']), value=sobject)
