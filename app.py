@@ -30,6 +30,9 @@ def sf_data():
         fields = ('Body' if sobject_type == 'FeedItem' else 'CommentBody', 'ParentId', 'CreatedById', 'CreatedDate')
         filtered_sobject_list = [ {key: x[key] for key in fields} for x in sobject_list ]
         for sobject in filtered_sobject_list:
+            # Normalize all body fields to be called "Body".
+            if 'CommentBody' in sobject:
+                sobject['Body'] = sobject.pop('CommentBody')
             write_to_kafka(key=str(sobject['ParentId']), value=sobject)
         return str(filtered_sobject_list)
 
