@@ -27,12 +27,19 @@ def sf_data():
         sobject_list = request.get_json() or []
         sobject_type = sobject_list[0]['attributes']['type'] if sobject_list else None
 
-        fields = ('Body' if sobject_type == 'FeedItem' else 'CommentBody', 'ParentId', 'CreatedById', 'CreatedDate')
+        fields = ('Body' if sobject_type == 'FeedItem' else 'CommentBody',
+                  'Id' if sobject_type == 'FeedItem' else 'FeedItemId',
+                  'ParentId',
+                  'CreatedById',
+                  'CreatedDate')
         filtered_sobject_list = [ {key: x[key] for key in fields} for x in sobject_list ]
         for sobject in filtered_sobject_list:
             # Normalize all body fields to be called "Body".
             if 'CommentBody' in sobject:
                 sobject['Body'] = sobject.pop('CommentBody')
+            # Normalize all feed item ID fields to be called "FeedItemId".
+            if 'FeedItemId' not in sobject:
+                sobject['FeedItemId'] = sobject.pop('Id')
             write_to_kafka(key=str(sobject['ParentId']), value=sobject)
         return str(filtered_sobject_list)
 
