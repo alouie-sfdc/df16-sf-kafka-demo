@@ -15,3 +15,10 @@ gunicorn
 # ----------------------
 kafka-python
 cryptography
+
+
+# ----------------------
+Analysis
+# ----------------------
+textblob
+psycopg2
