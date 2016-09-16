@@ -81,8 +81,11 @@ def get_kafka_brokers():
     Parses the KAKFA_URL and returns a list of hostname:port pairs in the format
     that kafka-python expects.
     """
-    # NOTE: We assume that Kafka environment variables are present. If using
+    # NOTE: The Kafka environment variables need to be present. If using
     # Apache Kafka on Heroku, they will be available in your app configuration.
+    if not os.environ.get('KAFKA_URL'):
+        raise RuntimeError('The KAFKA_URL config variable is not set.')
+
     return ['{}:{}'.format(parsedUrl.hostname, parsedUrl.port) for parsedUrl in
             [urlparse(url) for url in os.environ.get('KAFKA_URL').split(',')]]
 

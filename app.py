@@ -2,7 +2,7 @@
 Simple Flask app to receive Salesforce data and write it to Kafka.
 """
 
-import kafka_adapter
+import kafka_helper
 import os
 from flask import Flask, request
 
@@ -10,7 +10,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
 
 CHATTER_TOPIC = 'chatter'
-PRODUCER = kafka_adapter.get_kafka_producer()
+PRODUCER = kafka_helper.get_kafka_producer()
 
 
 @app.route('/sf-data', methods=['POST'])

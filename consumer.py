@@ -3,7 +3,7 @@ Kafka consumer that does sentiment analysis of Chatter data. It identifies the m
 polarizing threads and then posts to them via Heroku Connect.
 """
 
-import kafka_adapter
+import kafka_helper
 import operator
 import os
 import psycopg2
@@ -23,7 +23,7 @@ class SentimentAnalyzer(object):
         analysis of each message. Aggregates the results into averages for
         each thread.
         """
-        consumer = kafka_adapter.get_kafka_consumer(topic='chatter')
+        consumer = kafka_helper.get_kafka_consumer(topic='chatter')
 
         for message in consumer:
             print ("%s:%d:%d: key=%s value=%s" % (message.topic, message.partition,
