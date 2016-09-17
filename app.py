@@ -4,7 +4,7 @@ Simple Flask app to receive Salesforce data and write it to Kafka.
 
 import kafka_helper
 import os
-from flask import Flask, request
+from flask import Flask, abort, request
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
@@ -19,7 +19,9 @@ def sf_data():
     Receives serialized sObject data and writes selected fields to Kafka.
     Intended to be called from an asynchronous Apex.
     """
-    verify_secret_key(request)
+    if not verify_secret_key(request):
+        abort(401)
+
     if request.method == 'POST':
         filtered_sobject_list = filter_sobject_list(request.get_json() or [])
         for sobject in filtered_sobject_list:
@@ -29,7 +31,7 @@ def sf_data():
 
 def verify_secret_key(request):
     # TODO: verify origin of request using the secret key.
-    pass
+    return True
 
 
 def filter_sobject_list(sobject_list):
