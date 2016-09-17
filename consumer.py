@@ -46,7 +46,20 @@ class SentimentAnalyzer(object):
         """
         Returns a namedtuple containing the most negative and positive threads.
         """
-        sorted_items = sorted(self.feed_item_stats.items(), key=lambda x: operator.itemgetter(1)(x)['average'])
+
+        def sort_function(x):
+            # Give the rankings a higher/lower weight if they have at least
+            # 1 feed item + 3 comments.
+            item = operator.itemgetter(1)(x)
+            value = item['average']
+            if item['num_times'] >= 4:
+                if item['average'] > 0:
+                    value += 1
+                elif item['average'] < 0:
+                    value -= 1
+            return value
+
+        sorted_items = sorted(self.feed_item_stats.items(), key=sort_function)
         Extremes = namedtuple('Extremes', ['negative', 'positive'])
         return Extremes(negative=sorted_items[0], positive=sorted_items[-1])
 
