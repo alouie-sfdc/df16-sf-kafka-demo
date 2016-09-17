@@ -9,7 +9,7 @@ from flask import Flask, abort, request
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'this_should_be_configured')
 
-CHATTER_TOPIC = 'chatter'
+CHATTER_KAFKA_TOPIC = 'chatter'
 PRODUCER = kafka_helper.get_kafka_producer()
 
 
@@ -59,7 +59,7 @@ def filter_sobject_list(sobject_list):
 
 
 def write_to_kafka(key, value):
-    PRODUCER.send(CHATTER_TOPIC, key=key, value=value)
+    PRODUCER.send(CHATTER_KAFKA_TOPIC, key=key, value=value)
     PRODUCER.flush()
 
 
