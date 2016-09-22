@@ -14,6 +14,7 @@ This creates the app that receives REST requests from Salesforce and writes to K
 
 1. `heroku apps:create MY-APP-NAME`
 1. `heroku addons:create heroku-kafka:beta-standard-0`
+1. `heroku plugins:install heroku-kafka`
 1. `heroku kafka:wait`
 1. `heroku kafka:topics:create chatter`
 1. Deploy this repo to your app.
