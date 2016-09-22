@@ -84,22 +84,24 @@ class SentimentAnalyzer(object):
                 print body
 
 
-# Posgres configuration.
-urlparse.uses_netloc.append("postgres")
-url = urlparse.urlparse(os.environ["DATABASE_URL"])
-
-conn = psycopg2.connect(
-    database=url.path[1:],
-    user=url.username,
-    password=url.password,
-    host=url.hostname,
-    port=url.port
-)
+# Postgres configuration. Will be used if we write back to Salesforce with Heroku Connect.
+db_url = os.environ.get("DATABASE_URL")
+if db_url:
+    urlparse.uses_netloc.append("postgres")
+    url = urlparse.urlparse(db_url)
+    conn = psycopg2.connect(
+        database=url.path[1:],
+        user=url.username,
+        password=url.password,
+        host=url.hostname,
+        port=url.port
+    )
 
 if __name__ == '__main__':
     analyzer = SentimentAnalyzer()
     try:
         analyzer.kafka_stream_analysis_loop()
     except KeyboardInterrupt:
-        analyzer.write_results_to_db(conn)
+        if db_url:
+            analyzer.write_results_to_db(conn)
         exit()
