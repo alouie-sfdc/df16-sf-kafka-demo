@@ -70,8 +70,8 @@ class SentimentAnalyzer(object):
         """
         extremes = self.get_most_negative_and_positive()
 
-        negative_body = "Hello people. This was the most negative thread. Sentiment score: {}".format(extremes.negative[1]['average'])
-        positive_body = "Hello people. This was the most positive thread. Sentiment score: {}".format(extremes.positive[1]['average'])
+        negative_body = "Why so down? It's time to cheer up, people! This was the most negative thread. Sentiment score: {}".format(extremes.negative[1]['average'])
+        positive_body = "Congratulations, this was the most positive thread! Sentiment score: {}".format(extremes.positive[1]['average'])
 
         with conn, conn.cursor() as cursor:
             for body in [(negative_body, extremes.negative[0]),
@@ -81,7 +81,7 @@ class SentimentAnalyzer(object):
                        VALUES(%s, %s);""",
                     body
                 )
-                print body
+                print "\n{}".format(body)
 
 
 # Postgres configuration. Will be used if we write back to Salesforce with Heroku Connect.
